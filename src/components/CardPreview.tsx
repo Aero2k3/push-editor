@@ -23,7 +23,8 @@ export default function CardPreview({ card, style, format, cardRef, onPositionCh
         const el = wrapperRef.current;
         if (!el) return;
         const ro = new ResizeObserver(() => {
-            setContainerMaxWidth(Math.min(420, el.clientWidth - 8));
+            const w = el.clientWidth;
+            if (w > 0) setContainerMaxWidth(Math.max(200, Math.min(420, w - 8)));
         });
         ro.observe(el);
         return () => ro.disconnect();

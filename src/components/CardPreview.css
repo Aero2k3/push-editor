@@ -1,0 +1,108 @@
+.card-preview-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-scale-container {
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== Card Root ===== */
+.card-root {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-bg-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== Draggable Field ===== */
+.draggable-field {
+  position: absolute;
+  cursor: grab;
+  z-index: 1;
+  max-width: 90%;
+  user-select: none;
+  transition: box-shadow 0.15s, outline 0.15s;
+  outline: 2px solid transparent;
+  border-radius: 4px;
+}
+
+.draggable-field:hover {
+  outline: 2px dashed rgba(212, 131, 109, 0.5);
+}
+
+.draggable-field.dragging {
+  cursor: grabbing;
+  outline: 2px solid rgba(212, 131, 109, 0.8);
+  z-index: 10;
+}
+
+/* ===== Field Styles ===== */
+
+.field-brand {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.field-title {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.field-title .placeholder {
+  opacity: 0.15;
+}
+
+.title-cover {
+  font-size: 106px;
+}
+
+.title-step {
+  font-size: 82px;
+}
+
+.title-center {
+  font-size: 101px;
+  text-align: center;
+}
+
+.title-closing {
+  font-size: 115px;
+}
+
+.field-subtitle {
+  font-size: 36px;
+  line-height: 1.45;
+  margin: 0;
+  font-style: italic;
+}
+
+.field-text {
+  font-size: 31px;
+  line-height: 1.55;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.field-website {
+  font-size: 22px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.field-slide-number {
+  font-size: 44px;
+  font-weight: 700;
+  font-style: italic;
+}

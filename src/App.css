@@ -1,0 +1,168 @@
+/* ===== Reset & Global ===== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #121212;
+    color: #E0E0E0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* ===== App Layout ===== */
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-bottom: 1px solid #1E1E1E;
+    background: #161616;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    text-transform: uppercase;
+}
+
+.logo-mark {
+    background: linear-gradient(135deg, #E86F2A, #FF8F50);
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 18px;
+    margin-right: 6px;
+}
+
+.logo-text {
+    color: #E0E0E0;
+    letter-spacing: 0.05em;
+}
+
+.header-subtitle {
+    font-size: 12px;
+    color: #555;
+    padding-left: 8px;
+    border-left: 1px solid #333;
+}
+
+/* ===== Desktop Layout (2 columns) ===== */
+.app.desktop .app-main {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    flex: 1;
+    gap: 0;
+}
+
+.app.desktop .preview-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: #0D0D0D;
+    min-height: calc(100vh - 65px);
+    /* Subtle grid pattern */
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+.app.desktop .controls-section {
+    background: #1E1E1E;
+    border-left: 1px solid #2A2A2A;
+    overflow-y: auto;
+    max-height: calc(100vh - 65px);
+}
+
+.controls-inner {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ===== Mobile Layout (1 column) ===== */
+.app.mobile .app-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.app.mobile .preview-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 12px;
+    background: #0D0D0D;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+.app.mobile .controls-section {
+    background: #1E1E1E;
+    border-top: 1px solid #2A2A2A;
+}
+
+.app.mobile .controls-inner {
+    padding: 16px;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1E1E1E;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3A3A3A;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4A4A4A;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 800px) {
+    .app.desktop .app-main {
+        grid-template-columns: 1fr;
+    }
+
+    .app.desktop .preview-section {
+        min-height: auto;
+        padding: 20px 12px;
+    }
+
+    .app.desktop .controls-section {
+        border-left: none;
+        border-top: 1px solid #2A2A2A;
+        max-height: none;
+    }
+}

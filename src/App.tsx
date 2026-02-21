@@ -82,6 +82,11 @@ export default function App() {
         }));
     }, []);
 
+    // When a field is pinch-resized, update its font size
+    const handleFontSizeChange = useCallback((key: string, size: number) => {
+        setCard((prev) => ({ ...prev, [key]: size }));
+    }, []);
+
     return (
         <div className={`app ${appLayout}`}>
             <header className="app-header">
@@ -100,6 +105,7 @@ export default function App() {
                         format={format}
                         cardRef={cardRef}
                         onPositionChange={handlePositionChange}
+                        onFontSizeChange={handleFontSizeChange}
                     />
                 </section>
 

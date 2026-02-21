@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
 import type { CardData, StyleConfig, Format, FieldPositions } from '../types';
 import { formatSizes } from '../templates';
 import './CardPreview.css';
@@ -9,13 +9,26 @@ interface Props {
     format: Format;
     cardRef: React.Ref<HTMLDivElement>;
     onPositionChange?: (positions: Partial<FieldPositions>) => void;
+    onFontSizeChange?: (key: string, size: number) => void;
 }
 
 type FieldKey = keyof FieldPositions;
 
-export default function CardPreview({ card, style, format, cardRef, onPositionChange }: Props) {
+export default function CardPreview({ card, style, format, cardRef, onPositionChange, onFontSizeChange }: Props) {
     const size = formatSizes[format];
-    const containerMaxWidth = 420;
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const [containerMaxWidth, setContainerMaxWidth] = useState(Math.min(420, window.innerWidth - 24));
+
+    useEffect(() => {
+        const el = wrapperRef.current;
+        if (!el) return;
+        const ro = new ResizeObserver(() => {
+            setContainerMaxWidth(Math.min(420, el.clientWidth - 8));
+        });
+        ro.observe(el);
+        return () => ro.disconnect();
+    }, []);
+
     const scale = Math.min(containerMaxWidth / size.width, 1);
 
     // Background style
@@ -35,7 +48,7 @@ export default function CardPreview({ card, style, format, cardRef, onPositionCh
     }
 
     return (
-        <div className="card-preview-wrapper">
+        <div ref={wrapperRef} className="card-preview-wrapper">
             <div
                 className="card-scale-container"
                 style={{ width: size.width * scale, height: size.height * scale }}
@@ -53,6 +66,8 @@ export default function CardPreview({ card, style, format, cardRef, onPositionCh
                         cardWidth={size.width}
                         cardHeight={size.height}
                         onPositionChange={onPositionChange}
+                        sizeKey="brandSize"
+                        onFontSizeChange={onFontSizeChange}
                     >
                         <div className="field-brand" style={{ color: card.brandColor, fontFamily: style.fontTitle, fontSize: card.brandSize }}>
                             {card.brand}
@@ -81,6 +96,8 @@ export default function CardPreview({ card, style, format, cardRef, onPositionCh
                         cardWidth={size.width}
                         cardHeight={size.height}
                         onPositionChange={onPositionChange}
+                        sizeKey="titleSize"
+                        onFontSizeChange={onFontSizeChange}
                     >
                         <h1
                             className="field-title"
@@ -98,6 +115,8 @@ export default function CardPreview({ card, style, format, cardRef, onPositionCh
                             cardWidth={size.width}
                             cardHeight={size.height}
                             onPositionChange={onPositionChange}
+                            sizeKey="subtitleSize"
+                            onFontSizeChange={onFontSizeChange}
                         >
                             <p className="field-subtitle" style={{ color: card.subtitleColor, fontSize: card.subtitleSize }}>
                                 {card.subtitle}
@@ -113,6 +132,8 @@ export default function CardPreview({ card, style, format, cardRef, onPositionCh
                             cardWidth={size.width}
                             cardHeight={size.height}
                             onPositionChange={onPositionChange}
+                            sizeKey="textSize"
+                            onFontSizeChange={onFontSizeChange}
                         >
                             <p className="field-text" style={{ color: card.textColor, fontSize: card.textSize }}>
                                 {card.text}
@@ -128,6 +149,8 @@ export default function CardPreview({ card, style, format, cardRef, onPositionCh
                             cardWidth={size.width}
                             cardHeight={size.height}
                             onPositionChange={onPositionChange}
+                            sizeKey="websiteSize"
+                            onFontSizeChange={onFontSizeChange}
                         >
                             <div className="field-website" style={{ color: card.websiteColor, fontSize: card.websiteSize }}>
                                 {card.website}
@@ -150,13 +173,16 @@ interface DragProps {
     cardWidth: number;
     cardHeight: number;
     onPositionChange?: (positions: Partial<FieldPositions>) => void;
+    sizeKey?: string;
+    onFontSizeChange?: (key: string, size: number) => void;
     children: React.ReactNode;
 }
 
-function DraggableField({ fieldKey, card, scale, cardWidth, cardHeight, onPositionChange, children }: DragProps) {
+function DraggableField({ fieldKey, card, scale, cardWidth, cardHeight, onPositionChange, sizeKey, onFontSizeChange, children }: DragProps) {
     const pos = card.positions[fieldKey];
     const [dragging, setDragging] = useState(false);
     const dragStart = useRef({ mouseX: 0, mouseY: 0, startX: pos.x, startY: pos.y });
+    const pinchRef = useRef({ startDist: 0, startSize: 0 });
 
     const handleMouseDown = useCallback((e: React.MouseEvent) => {
         if (!onPositionChange) return;
@@ -190,6 +216,36 @@ function DraggableField({ fieldKey, card, scale, cardWidth, cardHeight, onPositi
 
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
         if (!onPositionChange) return;
+
+        // 📐 Pinch-to-resize: 2 fingers = font size change
+        if (e.touches.length === 2 && sizeKey && onFontSizeChange) {
+            e.preventDefault();
+            const t1 = e.touches[0], t2 = e.touches[1];
+            const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+            const currentSize = (card as any)[sizeKey] || 30;
+            pinchRef.current = { startDist: dist, startSize: currentSize };
+
+            const handlePinchMove = (ev: TouchEvent) => {
+                if (ev.touches.length < 2) return;
+                ev.preventDefault();
+                const p1 = ev.touches[0], p2 = ev.touches[1];
+                const newDist = Math.hypot(p2.clientX - p1.clientX, p2.clientY - p1.clientY);
+                const ratio = newDist / pinchRef.current.startDist;
+                const newSize = Math.round(Math.max(10, Math.min(200, pinchRef.current.startSize * ratio)));
+                onFontSizeChange(sizeKey, newSize);
+            };
+
+            const handlePinchEnd = () => {
+                window.removeEventListener('touchmove', handlePinchMove);
+                window.removeEventListener('touchend', handlePinchEnd);
+            };
+
+            window.addEventListener('touchmove', handlePinchMove, { passive: false });
+            window.addEventListener('touchend', handlePinchEnd);
+            return;
+        }
+
+        // 👆 Single touch = drag position
         const touch = e.touches[0];
         setDragging(true);
         dragStart.current = {
@@ -217,7 +273,7 @@ function DraggableField({ fieldKey, card, scale, cardWidth, cardHeight, onPositi
 
         window.addEventListener('touchmove', handleTouchMove, { passive: false });
         window.addEventListener('touchend', handleTouchEnd);
-    }, [fieldKey, pos, scale, cardWidth, cardHeight, onPositionChange]);
+    }, [fieldKey, pos, scale, cardWidth, cardHeight, onPositionChange, sizeKey, onFontSizeChange, card]);
 
     return (
         <div

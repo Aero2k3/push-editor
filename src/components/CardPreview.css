@@ -13,6 +13,7 @@
 .card-root {
   position: relative;
   overflow: hidden;
+  touch-action: none;
 }
 
 .card-bg-overlay {
@@ -29,6 +30,7 @@
   z-index: 1;
   max-width: 90%;
   user-select: none;
+  touch-action: none;
   transition: box-shadow 0.15s, outline 0.15s;
   outline: 2px solid transparent;
   border-radius: 4px;

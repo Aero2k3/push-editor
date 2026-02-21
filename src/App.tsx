@@ -35,8 +35,23 @@ const defaultCard: CardData = {
 function getInitialData(): Partial<CardData> {
     const params = new URLSearchParams(window.location.search);
     const data: Partial<CardData> = {};
-    if (params.get('title')) data.title = decodeURIComponent(params.get('title')!);
-    if (params.get('text')) data.text = decodeURIComponent(params.get('text')!);
+    if (params.get('title')) {
+        data.title = decodeURIComponent(params.get('title')!);
+        // Auto-fit title size based on length
+        const len = data.title.length;
+        if (len > 100) data.titleSize = 36;
+        else if (len > 70) data.titleSize = 44;
+        else if (len > 40) data.titleSize = 56;
+        else if (len > 20) data.titleSize = 72;
+        // else keep default 106
+    }
+    if (params.get('text')) {
+        data.text = decodeURIComponent(params.get('text')!);
+        const len = data.text.length;
+        if (len > 200) data.textSize = 22;
+        else if (len > 100) data.textSize = 26;
+        // else keep default 31
+    }
     if (params.get('brand')) data.brand = decodeURIComponent(params.get('brand')!);
     return data;
 }
